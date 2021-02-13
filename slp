@@ -1,0 +1,129 @@
+#! /usr/bin/env python3
+
+# usage examples:
+# A. without using seconds, but only hours and minutes
+
+# ./slp 10        -> wait 10 minutes
+# ./slp 3:35      -> wait 3 hours and 35 minutes
+# ./slp 1:00      -> wait 1 hour
+# ./slp 65        -> wait 1 hour and 5 minutes
+
+# -----------------------------
+
+# usage examples:
+# B. using seconds
+
+# ./slp 10s       -> wait 10 seconds
+# ./slp 3:35s     -> wait 3 minutes and 35 seconds
+# ./slp 1:00s     -> wait 1 minute
+# ./slp 65s       -> wait 1 minute and 5 seconds
+# ./slp 1:12:34   -> wait 1 hour, 12 minutes and 34 seconds
+# ./slp 1:12:34s  -> wait 1 hour, 12 minutes and 34 seconds
+
+# -----------------------------
+
+import time
+import datetime
+import argparse
+import re
+import sys
+
+
+
+cns = '\033[31m\033[F\033[JAttendere\033[33m'
+
+
+
+def calc(hrs, mins, elapsed_secs):
+    start_time = datetime.timedelta(hours=hrs, minutes=mins)
+    elapsed = datetime.timedelta(seconds=elapsed_secs)
+    remaining = start_time - elapsed
+    h, resto = divmod(remaining.seconds, 3600)
+    m, s = divmod(resto, 60)
+    return h, m, s
+
+
+
+def time_print(h, m, s):
+    if h > 0:
+        print('{} {}:{:02d}:{:02d}'.format(cns, h, m, s))
+    elif m > 0:
+        print('{} {}:{:02d}'.format(cns, m, s))
+    elif s > 1:
+        print('{} {} secondi'.format(cns, s))
+    elif s == 1:
+        print('{} 1 secondo'.format(cns))
+
+
+
+
+# -----------------------------------------------------------------------
+#  Main execution
+# -----------------------------------------------------------------------
+
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('TIME', help='time to wait (in minutes). You can also write h:mm if you require to wait hours')
+args = parser.parse_args()
+
+
+m1 = re.match(r'(\d+):(\d+):(\d+)s?$', args.TIME)
+m2 = re.match(r'(\d+):(\d+)$', args.TIME)
+m2s = re.match(r'(\d+):(\d+)s$', args.TIME)
+m3 = re.match(r'(\d+)', args.TIME)
+m3s = re.match(r'(\d+)s', args.TIME)
+
+
+hours=0
+minutes=1
+seconds=0
+
+
+if m1:
+    hours = int(m1.group(1))
+    minutes = int(m1.group(2))
+    seconds = int(m1.group(3))
+elif m2s:
+    hours = 0
+    minutes = int(m2s.group(1))
+    seconds = int(m2s.group(2))
+elif m2:
+    hours = int(m2.group(1))
+    minutes = int(m2.group(2))
+    seconds = 0
+elif m3s:
+    hours = 0
+    minutes = 0
+    seconds = int(m3s.group(1))
+elif m3:
+    hours = 0
+    minutes = int(m3.group(1))
+    seconds = 0
+else:
+    print('\033[31mError: argument must be a time\033[0m')
+    print('\nexamples: 1:00 = 1hour;  50 = 50 minutes; 1:00:10 = 1h and 10 seconds')
+    print('          1:10s = 1 minute and 10 seconds; 3s = 3 seconds')
+    sys.exit(1)
+
+
+
+awaiting = (hours * 3600) + (minutes * 60)
+
+
+
+
+
+
+
+
+print('\033[33m')
+print('')
+
+for i in range(awaiting):
+    h, m, s = calc(hours, minutes, i)
+    time_print(h, m, s)
+    time.sleep(1)
+
+
+print('\033[32m\033[F\033[JPronto.\033[0m')

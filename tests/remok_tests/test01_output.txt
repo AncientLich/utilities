@@ -1,0 +1,21 @@
+#! /bin/bash
+              
+echo "Warning: this script requires to be launched with \"sudo\" command."
+echo "Warning: this script will auto-delete itself after execution."
+echo "if you are not using \"sudo\" press Ctrl + C"
+echo "or input any number or key and press return to contine: "
+read value
+
+apt purge linux-headers-5.0.0-62
+apt purge linux-headers-5.0.0-62-generic
+apt purge linux-modules-5.0.0-62-generic
+apt purge linux-modules-extra-5.0.0-62-generic
+apt purge linux-image-5.0.0-62-generic
+apt purge linux-headers-5.0.0-65
+apt purge linux-headers-5.0.0-65-generic
+apt purge linux-modules-5.0.0-65-generic
+apt purge linux-modules-extra-5.0.0-65-generic
+apt purge linux-image-5.0.0-65-generic
+# note: saved kernel 5.4.0-62
+# note: saved kernel 5.4.0-65
+rm kernel_remove

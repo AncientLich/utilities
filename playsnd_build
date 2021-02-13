@@ -1,0 +1,12 @@
+#! /bin/bash
+
+# requirements for building:
+# 1) gcc (with c++ support) compiler
+# 2) pkg-config
+# 3) SDL2 development libraries
+# 4) SDL2_mixer development libraries
+
+g++ -c -o main.o playsnd.cpp $(sdl2-config --cflags) $(pkg-config SDL2_mixer --cflags)
+g++ -o playsnd main.o $(sdl2-config --libs) $(pkg-config SDL2_mixer --libs)
+rm main.o
+

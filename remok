@@ -1,0 +1,208 @@
+#! /usr/bin/env python3
+
+import subprocess
+import re
+import sys
+import pathlib
+
+
+KERNEL_REMOVE_PATH = pathlib.Path("kernel_remove")
+
+
+# Nobun: subprocess.run(..., check=True, capture_output=True) 
+# Nobun: https://docs.python.org/3/library/subprocess.html#older-high-level-api they're older and each have the recommendations
+# 
+
+
+# ---------------------------------------------------------
+#  Kernel classes:
+#  every kernel will be stored as Kernel object
+#  every Kernel will have those properties:
+#  - version: (version of kernel as tuple/list of four values)
+#  - kgeneric: an object containing kernel-generic
+#  - kbase: an object containg kernel that doesn't end with (-generic)
+#
+#  kbase and kgeneric are structured as another class object and used internally by Kernel.
+#  you don't need to interact with kbase and kgeneric directly in the rest of code
+#
+#  KernelSub is the class definition used by Kernel.kbase and Kernel.kgeneric objects
+#  this class interacts only with Kernel class and doesn't need to be used in the rest of the code
+
+
+class KernelSub:
+    def __init__(self):
+        self.headers=None
+        self.modules=None
+        self.modules_extra=None
+        self.image=None
+    
+    def is_complete(self):
+        return all([self.headers, self.modules, self.modules_extra, self.image])
+    
+    def tocmd(self):
+        value=[]
+        for x in (self.headers, self.modules, self.modules_extra, self.image):
+            if x:
+                value.append('apt purge {}'.format(x))
+        return '\n'.join(value)
+    
+    def add_component(self, component):
+        # component is a dict with those fields:
+        # 'name': complete name of the kernel component
+        # 'component': type of component (headers, image, modules, modules-extra)
+        # 'version': version expressed as list of four values
+        # 'version_string': version expressed as string
+        # 'type': 'generic' or 'base'
+        if component['component'] == 'headers':
+            self.headers = component['name']
+        elif component['component'] == 'image':
+            self.image = component['name']
+        elif component['component'] == 'modules':
+            self.modules = component['name']
+        else:
+            self.modules_extra = component['name']
+
+
+class Kernel:
+    def __init__(self, version):
+        self.version=version
+        self.kbase=KernelSub()
+        self.kgeneric=KernelSub()
+    
+    def is_complete(self):
+        return self.kgeneric.is_complete() or self.kbase.is_complete()
+    
+    def tocmd(self):
+        return '{}\n{}'.format(self.kbase.tocmd(), self.kgeneric.tocmd())
+    
+    def add_component(self, component):
+        # component is a dict with those fields:
+        # 'name': complete name of the kernel component
+        # 'component': type of component (headers, image, modules, modules-extra)
+        # 'version': version expressed as list of four values
+        # 'version_string': version expressed as string
+        # 'type': 'generic' or 'base'
+        if component['type'] == 'generic':
+            self.kgeneric.add_component(component)
+        else:
+            self.kbase.add_component(component)
+   
+    # operator overload "less than" for making Kernel sortable
+    def __lt__(self, other):
+        return self.version < other.version
+    
+    # operator == used only for tests. Not used in script code
+    def __eq__(self, other):
+        return self.tocmd() == other.tocmd()
+
+
+# -----------------
+# functions
+# ----------------
+
+
+def arch_is_valid(arch):
+    for x in ('all', 'amd64', 'i386'):
+        if arch == x:
+            return True
+    return False
+
+
+
+def get_kernel_infos():
+    str_kernels_unfiltered = str(subprocess.check_output(["dpkg", "-l", "linux*"])).replace(r"\n", "\n")
+    kernels_unfiltered = str_kernels_unfiltered.split('\n')
+    kernel_infos = []
+    
+    # regexp match groups:
+    # 
+    # 1. name (ex. linux-modules-extra-5.4.0-65-generic )
+    # 2. headers, image, modules, modules-extra
+    # 3. VERSION_(1)
+    # 4. VERSION_(2)
+    # 5. VERSION_(3)
+    # 6. VERSION_(4)
+    # 7. ('-generic' or '')
+    # 8. (version string)
+    # 9. amd64 / all / i386 
+    kernel_regexp = r'ii\s+(linux-(headers|image|modules-extra|modules)-(\d+).(\d+).(\d+)-(\d+)(.*?))\s+(\d+.\d+.\d+-\d+).\d+\s+(\S+)'
+    
+    for k in kernels_unfiltered:
+        m = re.match(kernel_regexp, k)
+        if m:
+            vercheck = "{}.{}.{}-{}".format(m.group(3), m.group(4), m.group(5), m.group(6))
+            if vercheck == m.group(8) and arch_is_valid(m.group(9)):
+                kernel_infos.append({
+                    'name': m.group(1),
+                    'component': m.group(2),
+                    'version': [int(m.group(x)) for x in range(3,7)],
+                    'version_string': m.group(8),
+                    'type': 'generic' if 'generic' in m.group(7) else 'base'
+                })
+    # list of kernels as dict
+    # dict will have. 'name': complete name of the kernel component
+    #                 'component': type of component (headers, image, modules, modules-extra)
+    #                 'version': version expressed as list of four values
+    #                 'version_string': version expressed as string
+    #                 'type': 'generic' or 'base'
+    return kernel_infos
+
+
+
+def kernels_to_save_delete(kernels):
+    to_save = []
+    to_delete = []
+    for k in sorted(kernels, reverse=True):
+        if k.is_complete() and len(to_save) < 2:
+            to_save.append(k)
+        elif len(to_save) < 2:
+            raise ValueError("Fatal error: last 2 kernels missing one or more component. Exit 1")
+        # after saving 2 kernels it is not important whether the older kernels are complete or not
+        # they can be safetly removed
+        else:
+            to_delete.append(k)
+    return (to_save, to_delete)
+
+
+
+# ----------------------------
+#  main
+# -----------------------------
+
+
+
+def main():
+    kernel_infos=get_kernel_infos()
+    kernels = {}
+    for kinfo in kernel_infos:
+        version = kinfo['version_string']
+        if version not in kernels:
+            kernels[version] = Kernel(kinfo['version'])
+        kernels[version].add_component(kinfo)
+    kernel_list=list(kernels.values())
+    to_save, to_delete = kernels_to_save_delete(kernel_list)
+    if not to_delete:
+        print("There is currently no kernel to delete.")
+        sys.exit(0)
+    with KERNEL_REMOVE_PATH.open("w", encoding="utf8") as fo:
+        print(r'''#! /bin/bash
+              
+echo "Warning: this script requires to be launched with \"sudo\" command."
+echo "Warning: this script will auto-delete itself after execution."
+echo "if you are not using \"sudo\" press Ctrl + C"
+echo "or input any number or key and press return to contine: "
+read value''', file=fo)
+        print('', file=fo)
+        for k in sorted(to_delete):
+            print(k.tocmd(), file=fo)
+        for k in sorted(to_save):
+            print('# note: saved kernel {}.{}.{}-{}'.format(*k.version), file=fo)
+        print('rm kernel_remove', file=fo)
+    subprocess.call(['chmod', '+x', 'kernel_remove'])
+    print("kernel_remove created and ready to be used")
+
+
+
+if __name__ == "__main__":
+    main()
+

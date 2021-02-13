@@ -1,0 +1,55 @@
+# this is a fake file randomizing the order of the same content of test01.txt
+# this file is obtained running the generate_test02.py script
+
+|/ Err?=(nessuno)/R (reinstallazione richiesta) (Stato,Err: maiuscolo=grave)
+ii  linux-image-generic                   5.4.0.65.68          amd64        Generic Linux kernel image
+un  linux-kernel-log-daemon               <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+un  linux-image                           <nessuna>            <nessuna>    (nessuna descrizione disponibile)
++++-=====================================-====================-============-==============================================================
+ii  linux-modules-extra-5.0.0-65-generic  5.0.0-65.73          amd64        Fake kernel 2 (modules-extra)
+un  linux-restricted-common               <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+un  linux-headers-3.0                     <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+un  linux-headers                         <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+ii  linux-headers-5.4.0-65-generic        5.4.0-65.73          amd64        Linux kernel headers for version 5.4.0 on 64 bit x86 SMP
+un  linux-source-5.4.0                    <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+| Stato=Non/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+ii  linux-headers-5.4.0-62                5.4.0-62.70          all          Header files related to Linux kernel version 5.4.0
+ii  linux-modules-extra-5.4.0-65-generic  5.4.0-65.73          amd64        Linux kernel extra modules for version 5.4.0 on 64 bit x86 SMP
+ii  linux-image-5.0.0-62-generic          5.0.0-62.70          amd64        Fake kernel 1 (image)
+un  linux-firmware-snapdragon             <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+un  linux-doc                             <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+ii  linux-modules-extra-5.4.0-62-generic  5.4.0-62.70          amd64        Linux kernel extra modules for version 5.4.0 on 64 bit x86 SMP
+un  linux-image-unsigned-5.4.0-65-generic <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+ii  linux-headers-5.0.0-65-generic        5.0.0-65.73          amd64        Fake kernel 2
+Voluto=U (non noto)/I (installato)/R (rimosso)/P (rimosso totale)/H (in attesa)
+ii  linux-headers-5.4.0-62-generic        5.4.0-62.70          amd64        Linux kernel headers for version 5.4.0 on 64 bit x86 SMP
+ii  linux-headers-5.0.0-62                5.0.0-62.70          all          Fake kernel 1
+un  linux-kernel-headers                  <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+un  linux-headers-amd64                   <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+ii  linux-image-5.4.0-62-generic          5.4.0-62.70          amd64        Signed kernel image generic
+ii  linux-headers-5.0.0-62-generic        5.0.0-62.70          amd64        Fake kernel 1
+un  linux-firmware-raspi2                 <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+un  linux-image-unsigned-5.4.0-62-generic <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+ii  linux-headers-5.0.0-65                5.0.0-65.73          all          Fake kernel 2
+
+ 
+||/ Nome                                  Versione             Architettura Descrizione
+ii  linux-modules-5.0.0-65-generic        5.0.0-65.73          amd64        Fake kernel 2 (modules)
+ii  linux-sound-base                      1.0.25+dfsg-0ubuntu5 all          base package for ALSA and OSS sound systems
+un  separator                             <nothing>            <nothing>    <Fake line for test and separate>
+ii  linux-firmware                        1.187.9              all          Firmware for Linux kernel drivers
+un  linux-initramfs-tool                  <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+un  linux-tools                           <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+ii  linux-headers-generic                 5.4.0.65.68          amd64        Generic Linux kernel headers
+un  linux-headers-686-pae                 <nessuna>            <nessuna>    (nessuna descrizione disponibile)
+ii  linux-modules-5.4.0-62-generic        5.4.0-62.70          amd64        Linux kernel extra modules for version 5.4.0 on 64 bit x86 SMP
+ii  linux-modules-extra-5.0.0-62-generic  5.0.0-62.70          amd64        Fake kernel 1 (modules-extra)
+ii  linux-modules-5.4.0-65-generic        5.4.0-65.73          amd64        Linux kernel extra modules for version 5.4.0 on 64 bit x86 SMP
+ii  linux-image-5.4.0-65-generic          5.4.0-65.73          amd64        Signed kernel image generic
+ii  linux-libc-dev:amd64                  5.4.0-65.73          amd64        Linux Kernel Headers for development
+ii  linux-generic                         5.4.0.65.68          amd64        Complete Generic Linux kernel and headers
+un  separator                             <nothing>            <nothing>    <Fake line for test and separate>
+ii  linux-image-5.0.0-65-generic          5.0.0-65.73          amd64        Fake kernel 2 (image)
+ii  linux-headers-5.4.0-65                5.4.0-65.73          all          Header files related to Linux kernel version 5.4.0
+ii  linux-base                            4.5ubuntu3.1         all          Linux image base package
+ii  linux-modules-5.0.0-62-generic        5.0.0-62.70          amd64        Fake kernel 1 (modules)
