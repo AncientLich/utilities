@@ -36,8 +36,13 @@ launching the generated "kernel_remove" (requires sudo) will actually remove old
 
 How to use it
   
-   > ./remok                  -> generates kernel_remove
-   > sudo ./kernel_remove     -> step 2) remove old kernels
+   > ./remok
+
+in order to generate kernel_remove. Than:
+   
+   > sudo ./kernel_remove
+
+in order to actually remove old kernels
 
    
 ## slp
@@ -45,5 +50,10 @@ A simple cont-down timer. It will run until time elapsed showing you how much ti
 
 How to use it
 
-   > ./slp 10      -> 10 minutes 
-   > ./slp 3:35    -> 3 hours and 35 minutes
+   > ./slp 10
+
+wait 10 minutes
+   
+   > ./slp 3:35
+
+wait 3 hours and 35 minutes
