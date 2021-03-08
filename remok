@@ -101,17 +101,9 @@ class Kernel:
 # ----------------
 
 
-def arch_is_valid(arch):
-    for x in ('all', 'amd64', 'i386'):
-        if arch == x:
-            return True
-    return False
-
-
-
 def get_kernel_infos():
-    str_kernels_unfiltered = str(subprocess.check_output(["dpkg", "-l", "linux*"])).replace(r"\n", "\n")
-    kernels_unfiltered = str_kernels_unfiltered.split('\n')
+    kernels_unfiltered = subprocess.check_output(
+        ["dpkg", "-l", "linux*"])).decode("utf-8").split("\n")
     kernel_infos = []
     
     # regexp match groups:
@@ -125,13 +117,13 @@ def get_kernel_infos():
     # 7. ('-generic' or '')
     # 8. (version string)
     # 9. amd64 / all / i386 
-    kernel_regexp = r'ii\s+(linux-(headers|image|modules-extra|modules)-(\d+).(\d+).(\d+)-(\d+)(.*?))\s+(\d+.\d+.\d+-\d+).\d+\s+(\S+)'
+    kernel_regexp = r'(?:ii|rc)\s+(linux-(headers|image|modules-extra|modules)-(\d+).(\d+).(\d+)-(\d+)(.*?))\s+(\d+.\d+.\d+-\d+).\d+\s+(\S+)'
     
     for k in kernels_unfiltered:
         m = re.match(kernel_regexp, k)
         if m:
             vercheck = "{}.{}.{}-{}".format(m.group(3), m.group(4), m.group(5), m.group(6))
-            if vercheck == m.group(8) and arch_is_valid(m.group(9)):
+            if vercheck == m.group(8) and m.group(9) in ('all', 'amd64', 'i386'):
                 kernel_infos.append({
                     'name': m.group(1),
                     'component': m.group(2),
